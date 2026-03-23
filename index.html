@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>March Madness 2026</title>
+    <title>March Madness 2025</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -202,7 +202,7 @@
 <body>
 
 <header>
-    <div class="eyebrow">2026 Tournament</div>
+    <div class="eyebrow">2025 Tournament</div>
     <h1>March Madness</h1>
     <div class="subtitle">32-Team Field &nbsp;·&nbsp; Two Regions</div>
 </header>
@@ -231,11 +231,6 @@
 </div>
 
 <script>
-    // ── CONFIG ────────────────────────────────────────────────────────────────────
-    const API_KEY  = 'AIzaSyDlyPxBlYYZd9PpzMrQdZ1EtY86feV4HLc';
-    const SHEET_ID = '1RL-uJQzXWHlg2ck9qOOy-g2L02xnWLjf4GJaCkZ7pXc';
-    const TAB_NAME = 'Dealer_Team_Bracket';
-    // ─────────────────────────────────────────────────────────────────────────────
 
     // Your sheet columns:
     // A=Region  B=Round  C=Match  D=Team1  E=Team2  F=Score1  G=Score2  H=Winner
@@ -258,14 +253,15 @@
 
     async function loadFromSheet() {
         try {
-            // Fetch all 8 columns A through H
-            const url = 'netlify/functions/bracket.js';
+            const url = '/.netlify/functions/bracket';
             const res  = await fetch(url);
             const data = await res.json();
 
             if (data.error) throw new Error(`${data.error.status}: ${data.error.message}`);
 
             const rows = data.values || [];
+            console.log("Raw rows:", JSON.stringify(rows.slice(0,3)));
+            console.log("Total rows:", rows.length);
 
             // Detect and skip header row
             const start = rows[0]?.[0]?.toLowerCase() === 'region' ? 1 : 0;
@@ -298,7 +294,7 @@
         } catch (err) {
             document.getElementById('api-dot').className = 'dot error';
             document.getElementById('api-status-text').textContent = `Error: ${err.message}`;
-            // console.error(err);
+            console.error(err);
         }
     }
 
