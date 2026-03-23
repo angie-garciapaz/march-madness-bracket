@@ -276,6 +276,8 @@
                 const round  = parseInt(row[1]);
                 const team1  = (row[3] || '').trim();
                 const team2  = (row[4] || '').trim();
+                const score1 = (row[5] || '').trim(); // column F
+                const score2 = (row[6] || '').trim(); // column G
                 const winner = (row[7] || '').trim(); // column H
 
                 // Skip rows with no round number or no teams
@@ -283,7 +285,7 @@
 
                 const bucket = region.includes('south') ? south : north;
                 if (!bucket[round]) bucket[round] = [];
-                bucket[round].push({ team1, team2, winner });
+                bucket[round].push({ team1, team2, score1, score2, winner });
             });
 
             renderRegion('north-bracket', north);
