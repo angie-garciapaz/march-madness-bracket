@@ -259,7 +259,7 @@
     async function loadFromSheet() {
         try {
             // Fetch all 8 columns A through H
-            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${TAB_NAME}!A1:H500?key=${API_KEY}`;
+            const url = 'netlify/functions/bracket.js';
             const res  = await fetch(url);
             const data = await res.json();
 
