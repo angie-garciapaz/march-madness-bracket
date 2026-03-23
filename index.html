@@ -265,8 +265,6 @@
             if (data.error) throw new Error(`${data.error.status}: ${data.error.message}`);
 
             const rows = data.values || [];
-            // console.log("Raw rows:", JSON.stringify(rows.slice(0,3)));
-            // console.log("Total rows:", rows.length);
 
             // Detect and skip header row
             const start = rows[0]?.[0]?.toLowerCase() === 'region' ? 1 : 0;
