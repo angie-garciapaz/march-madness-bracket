@@ -337,7 +337,7 @@
                     const row = document.createElement('div');
                     row.className = 'team-row';
                     const cls = !name ? 'tbd' : isWinner ? 'winner-name' : '';
-                    row.innerHTML = `<span class="team-name ${cls}">${name || 'TBD'}</span>${score ? `<span class="team-score ${isWinner ? 'winner-score' : ''}"> &dash; ${score}</span>` : ''}`;
+                    row.innerHTML = `<span class="team-name ${cls}">${name || 'TBD'}</span>${score ? `<span class="team-score ${isWinner ? 'winner-score' : ''}">&nbsp;&dash;&nbsp;${score}</span>` : ''}`;
                     card.appendChild(row);
                 });
 
