@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>March Madness 2025</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0e1a;
+            --surface: #111827;
+            --border: #1e2d45;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --gold: #fbbf24;
+            --north: #f97316;
+            --south: #3b82f6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px 24px;
+        }
+
+        header .eyebrow {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--north);
+            margin-bottom: 8px;
+        }
+
+        header h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(48px, 8vw, 90px);
+            letter-spacing: 2px;
+            line-height: 1;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header .subtitle {
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+        .dot.live { background: #4ade80; box-shadow: 0 0 8px #4ade80; }
+        .dot.error { background: #f87171; }
+
+        .tournament-wrapper { padding: 30px 24px 60px; }
+        .region-block { margin-bottom: 56px; }
+
+        .region-label {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            letter-spacing: 3px;
+            padding: 0 0 14px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .region-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .region-divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--border), transparent);
+            margin: 10px 0 44px;
+        }
+
+        .bracket-scroll { overflow-x: auto; padding-bottom: 10px; }
+
+        .bracket {
+            display: flex;
+            align-items: stretch;
+            min-width: 900px;
+        }
+
+        .round-col {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .round-header {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-align: center;
+            padding: 0 6px 12px;
+        }
+
+        .round-matches {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-around;
+        }
+
+        .match-slot {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .matchup-card {
+            margin: 5px 6px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            overflow: hidden;
+            background: var(--surface);
+        }
+
+        .team-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .team-row:last-child { border-bottom: none; }
+
+        .team-name {
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text);
+        }
+        .team-name.tbd { color: var(--border); font-style: italic; }
+        .team-name.winner-name { color: #4ade80; font-weight: 600; }
+
+        .champion-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px 8px;
+            text-align: center;
+        }
+
+        .trophy { font-size: 30px; animation: float 3s ease-in-out infinite; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .champ-label {
+            font-size: 9px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .champ-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 18px;
+            letter-spacing: 2px;
+            color: var(--gold);
+            min-height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="eyebrow">2025 Tournament</div>
+    <h1>March Madness</h1>
+    <div class="subtitle">32-Team Field &nbsp;·&nbsp; Two Regions</div>
+</header>
+
+<div class="status-bar">
+    <div class="dot" id="api-dot"></div>
+    <span id="api-status-text">Loading bracket...</span>
+</div>
+
+<div class="tournament-wrapper">
+    <div class="region-block">
+        <div class="region-label" style="color:var(--north)">🟠 North Region</div>
+        <div class="bracket-scroll">
+            <div class="bracket" id="north-bracket"></div>
+        </div>
+    </div>
+
+    <div class="region-divider"></div>
+
+    <div class="region-block">
+        <div class="region-label" style="color:var(--south)">🔵 South Region</div>
+        <div class="bracket-scroll">
+            <div class="bracket" id="south-bracket"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ── CONFIG ────────────────────────────────────────────────────────────────────
+    const API_KEY  = 'AIzaSyDlyPxBlYYZd9PpzMrQdZ1EtY86feV4HLc';
+    const SHEET_ID = '1RL-uJQzXWHlg2ck9qOOy-g2L02xnWLjf4GJaCkZ7pXc';
+    const TAB_NAME = 'Dealer_Team_Bracket';
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    // Your sheet columns:
+    // A=Region  B=Round  C=Match  D=Team1  E=Team2  F=Score1  G=Score2  H=Winner
+    //
+    // To add future rounds, just append rows to your sheet. Example:
+    //   North | 2 | 1 | Joe Fernandez | Chris Kenny | | | Joe Fernandez
+    //   North | 3 | 1 | Joe Fernandez | Brett Morrison | | | Brett Morrison
+    //
+    // The bracket will automatically show new columns as rounds are added.
+    // Rounds with no data yet will not appear — the bracket grows as you fill it in.
+
+    const REFRESH_MS  = 60 * 1000;
+    const ROUND_NAMES = {
+        1: 'Round of 16',
+        2: 'Quarterfinals',
+        3: 'Semifinals',
+        4: 'Final'
+    };
+
+    async function loadFromSheet() {
+        try {
+            // Fetch all 8 columns A through H
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${TAB_NAME}!A1:H500?key=${API_KEY}`;
+            const res  = await fetch(url);
+            const data = await res.json();
+
+            if (data.error) throw new Error(`${data.error.status}: ${data.error.message}`);
+
+            const rows = data.values || [];
+            // console.log("Raw rows:", JSON.stringify(rows.slice(0,3)));
+            // console.log("Total rows:", rows.length);
+
+            // Detect and skip header row
+            const start = rows[0]?.[0]?.toLowerCase() === 'region' ? 1 : 0;
+
+            // Build: { north: { 1: [{team1, team2, winner}, ...], 2: [...] }, south: {...} }
+            const north = {};
+            const south = {};
+
+            rows.slice(start).forEach(row => {
+                const region = (row[0] || '').trim().toLowerCase();
+                const round  = parseInt(row[1]);
+                const team1  = (row[3] || '').trim();
+                const team2  = (row[4] || '').trim();
+                const winner = (row[7] || '').trim(); // column H
+
+                // Skip rows with no round number or no teams
+                if (!round || (!team1 && !team2)) return;
+
+                const bucket = region.includes('south') ? south : north;
+                if (!bucket[round]) bucket[round] = [];
+                bucket[round].push({ team1, team2, winner });
+            });
+
+            renderRegion('north-bracket', north);
+            renderRegion('south-bracket', south);
+
+            document.getElementById('api-dot').className = 'dot live';
+            document.getElementById('api-status-text').textContent = `Live · Last updated ${new Date().toLocaleTimeString()}`;
+
+        } catch (err) {
+            document.getElementById('api-dot').className = 'dot error';
+            document.getElementById('api-status-text').textContent = `Error: ${err.message}`;
+            // console.error(err);
+        }
+    }
+
+    function renderRegion(containerId, roundData) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+
+        const roundNumbers = Object.keys(roundData).map(Number).sort((a, b) => a - b);
+        if (roundNumbers.length === 0) return;
+
+        // Render one column per round
+        roundNumbers.forEach(rNum => {
+            const matches = roundData[rNum];
+
+            const col = document.createElement('div');
+            col.className = 'round-col';
+
+            const hdr = document.createElement('div');
+            hdr.className = 'round-header';
+            hdr.textContent = ROUND_NAMES[rNum] || `Round ${rNum}`;
+            col.appendChild(hdr);
+
+            const matchesDiv = document.createElement('div');
+            matchesDiv.className = 'round-matches';
+
+            matches.forEach(match => {
+                const slot = document.createElement('div');
+                slot.className = 'match-slot';
+
+                const card = document.createElement('div');
+                card.className = 'matchup-card';
+
+                [
+                    { name: match.team1, isWinner: !!match.winner && match.winner === match.team1 },
+                    { name: match.team2, isWinner: !!match.winner && match.winner === match.team2 },
+                ].forEach(({ name, isWinner }) => {
+                    const row = document.createElement('div');
+                    row.className = 'team-row';
+                    const cls = !name ? 'tbd' : isWinner ? 'winner-name' : '';
+                    row.innerHTML = `<span class="team-name ${cls}">${name || 'TBD'}</span>`;
+                    card.appendChild(row);
+                });
+
+                slot.appendChild(card);
+                matchesDiv.appendChild(slot);
+            });
+
+            col.appendChild(matchesDiv);
+            container.appendChild(col);
+        });
+
+        // Champion column — winner of the final match in the last round
+        const lastRound    = roundData[roundNumbers[roundNumbers.length - 1]] || [];
+        const finalMatch   = lastRound[0];
+        const champName    = finalMatch?.winner || '—';
+
+        const champCol = document.createElement('div');
+        champCol.className = 'round-col';
+        champCol.innerHTML = `
+    <div class="round-header">Champion</div>
+    <div class="round-matches">
+      <div class="champion-block">
+        <div class="trophy">🏆</div>
+        <div class="champ-label">Regional Champion</div>
+        <div class="champ-name">${champName}</div>
+      </div>
+    </div>
+  `;
+        container.appendChild(champCol);
+    }
+
+    // Load on page open, then refresh every 60 seconds
+    loadFromSheet();
+    setInterval(loadFromSheet, REFRESH_MS);
+</script>
+</body>
+</html>
