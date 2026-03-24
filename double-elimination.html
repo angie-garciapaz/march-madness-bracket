@@ -10,6 +10,7 @@
       --bg: #0a0e1a;
       --surface: #111827;
       --border: #1e2d45;
+      --line: #2a3f5f;
       --text: #e2e8f0;
       --muted: #64748b;
       --gold: #fbbf24;
@@ -17,27 +18,32 @@
       --losers: #3b82f6;
       --champ: #a855f7;
       --win-color: #4ade80;
-      --line: #2a3f5f;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       background: var(--bg);
       color: var(--text);
       font-family: 'DM Sans', sans-serif;
       min-height: 100vh;
+      overflow-x: auto;
     }
+
     header {
       text-align: center;
       padding: 36px 20px 20px;
     }
+
     header .eyebrow {
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 4px;
       text-transform: uppercase;
-      color: #f97316;
+      color: var(--winners);
       margin-bottom: 8px;
     }
+
     header h1 {
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(40px, 6vw, 72px);
@@ -48,6 +54,7 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+
     .status-bar {
       display: flex;
       align-items: center;
@@ -59,21 +66,184 @@
       border-bottom: 1px solid var(--border);
       font-size: 11px;
       color: var(--muted);
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
-    .dot { width:6px; height:6px; border-radius:50%; background:var(--muted); flex-shrink:0; }
-    .dot.live { background:#4ade80; box-shadow:0 0 8px #4ade80; }
-    .dot.error { background:#f87171; }
-    .bracket-wrap {
+
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+    .dot.live { background: #4ade80; box-shadow: 0 0 8px #4ade80; }
+    .dot.error { background: #f87171; }
+
+    /* ── Section labels ── */
+    .section-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 3px;
+      padding: 0 0 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      margin-right: 24px;
+    }
+
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border), transparent);
+      margin: 40px 24px;
+    }
+
+    /* ── Bracket tree layout ── */
+    .bracket-area {
       overflow-x: auto;
-      padding: 10px 20px 40px;
+      padding: 0 24px 20px;
     }
-    svg text { font-family: 'DM Sans', sans-serif; }
-    .section-title {
+
+    .bracket-tree {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      /* enough width so lines don't compress */
+    }
+
+    /* Each round column */
+    .r-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      flex: 0 0 180px;
+      position: relative;
+    }
+
+    /* ── Team slot (single line) ── */
+    .team-slot {
+      display: flex;
+      align-items: center;
+      height: 28px;
+      position: relative;
+      margin: 2px 0;
+    }
+
+    .team-slot .team-line {
+      flex: 1;
+      height: 28px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      background: transparent;
+    }
+
+    .team-slot .tname {
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text);
+      flex: 1;
+    }
+    .team-slot .tname.tbd-name { color: var(--muted); font-style: italic; }
+    .team-slot .tname.won { color: var(--win-color); font-weight: 700; }
+
+    .team-slot .tscore {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-left: 6px;
+      flex-shrink: 0;
+    }
+    .team-slot .tscore.won { color: var(--win-color); }
+
+    /* matchup = two team slots grouped, with right connector */
+    .matchup {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      margin: 0 0 0 0;
+    }
+
+    /* vertical line connecting the two teams on the right */
+    .matchup::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 14px;   /* center of first team */
+      height: calc(100% - 28px); /* down to center of second team */
+      width: 1px;
+      background: var(--line);
+    }
+
+    /* horizontal line from midpoint to next column */
+    .matchup .connector {
+      position: absolute;
+      right: -20px;
+      top: 50%;
+      width: 20px;
+      height: 1px;
+      background: var(--line);
+    }
+
+    /* spacer between matchups to vertically space them */
+    .match-spacer {
+      flex: 1;
+    }
+
+    /* round header */
+    .r-header {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      padding-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    /* ── Champion block ── */
+    .champ-col {
+      flex: 0 0 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px 10px;
+    }
+
+    .trophy { font-size: 28px; animation: float 3s ease-in-out infinite; }
+    @keyframes float {
+      0%,100%{ transform:translateY(0); }
+      50%{ transform:translateY(-5px); }
+    }
+
+    .champ-label {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .champ-name {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 16px;
-      letter-spacing: 3px;
-      padding: 20px 20px 4px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-align: center;
+      min-height: 22px;
+    }
+
+    .no-data {
+      color: var(--muted);
+      font-size: 12px;
+      padding: 20px 0;
+      font-style: italic;
     }
   </style>
 </head>
@@ -89,32 +259,31 @@
   <span id="api-status-text">Loading bracket...</span>
 </div>
 
-<div class="bracket-wrap">
-  <svg id="bracket-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+<div class="section-label" style="color:var(--winners)">🟠 Winner's Bracket</div>
+<div class="bracket-area">
+  <div class="bracket-tree" id="winners-bracket"></div>
+</div>
+
+<div class="section-divider"></div>
+
+<div class="section-label" style="color:var(--losers)">🔵 Loser's Bracket</div>
+<div class="bracket-area">
+  <div class="bracket-tree" id="losers-bracket"></div>
+</div>
+
+<div class="section-divider"></div>
+
+<div class="section-label" style="color:var(--champ)">🏆 Championship</div>
+<div class="bracket-area">
+  <div class="bracket-tree" id="champ-bracket"></div>
 </div>
 
 <script>
   const REFRESH_MS = 60 * 1000;
 
-  // ── Layout constants ──────────────────────────────────────────────────────────
-  const SLOT_W     = 150;  // width of a team name slot
-  const SLOT_H     = 22;   // height of each team line
-  const MATCH_GAP  = 6;    // gap between two teams in a match
-  const COL_GAP    = 60;   // horizontal gap between rounds
-  const ROUND_PAD  = 20;   // left padding
-  const LABEL_H    = 24;   // round label height
-  const LINE_COLOR = '#2a3f5f';
-  const TEXT_COLOR = '#e2e8f0';
-  const MUTED      = '#64748b';
-  const WIN_COLOR  = '#4ade80';
-  const GOLD       = '#fbbf24';
-  const BG_COLOR   = '#111827';
-  const MATCH_H    = SLOT_H * 2 + MATCH_GAP; // total height of one matchup
-
-  // ── Data ─────────────────────────────────────────────────────────────────────
-  let winnersData = {};
-  let losersData  = {};
-  let champData   = {};
+  const WINNERS_ROUNDS = { 1:'Round 1', 2:'Round 2', 3:'Semifinals', 4:"Winner's Final" };
+  const LOSERS_ROUNDS  = { 1:'Round 1', 2:'Round 2', 3:'Round 3',    4:'Round 4', 5:"Loser's Final" };
+  const CHAMP_ROUNDS   = { 1:'Grand Final', 2:'If Necessary' };
 
   async function loadFromSheet() {
     try {
@@ -125,7 +294,7 @@
       const rows  = data.values || [];
       const start = rows[0]?.[0]?.toLowerCase() === 'bracket' ? 1 : 0;
 
-      winnersData = {}; losersData = {}; champData = {};
+      const winners = {}, losers = {}, champ = {};
 
       rows.slice(start).forEach(row => {
         const bracket = (row[0]||'').trim().toLowerCase();
@@ -135,16 +304,22 @@
         const score1  = (row[5]||'').trim();
         const score2  = (row[6]||'').trim();
         const winner  = (row[7]||'').trim();
+
         if (!round) return;
-        const bucket = bracket.includes('winner') ? winnersData
-                : bracket.includes('loser')  ? losersData
-                        : bracket.includes('champ')  ? champData : null;
+
+        const bucket = bracket.includes('winner') ? winners
+                : bracket.includes('loser')  ? losers
+                        : bracket.includes('champ')  ? champ
+                                : null;
         if (!bucket) return;
+
         if (!bucket[round]) bucket[round] = [];
         bucket[round].push({ team1, team2, score1, score2, winner });
       });
 
-      drawBracket();
+      renderTree('winners-bracket', winners, WINNERS_ROUNDS);
+      renderTree('losers-bracket',  losers,  LOSERS_ROUNDS);
+      renderChamp('champ-bracket',  champ,   CHAMP_ROUNDS);
 
       document.getElementById('api-dot').className = 'dot live';
       document.getElementById('api-status-text').textContent = `Live · Last updated ${new Date().toLocaleTimeString()}`;
@@ -155,248 +330,151 @@
     }
   }
 
-  // ── SVG helpers ───────────────────────────────────────────────────────────────
-  function el(tag, attrs, parent) {
-    const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
-    for (const [k,v] of Object.entries(attrs)) e.setAttribute(k, v);
-    if (parent) parent.appendChild(e);
-    return e;
-  }
+  function makeTeamSlot(name, score, isWinner) {
+    const slot = document.createElement('div');
+    slot.className = 'team-slot';
 
-  function drawLine(svg, x1, y1, x2, y2, color) {
-    el('line', { x1, y1, x2, y2, stroke: color || LINE_COLOR, 'stroke-width': 1 }, svg);
-  }
+    const line = document.createElement('div');
+    line.className = 'team-line';
 
-  function drawText(svg, x, y, text, color, size, weight, anchor) {
-    const t = el('text', {
-      x, y,
-      fill: color || TEXT_COLOR,
-      'font-size': size || 12,
-      'font-weight': weight || 400,
-      'font-family': 'DM Sans, sans-serif',
-      'text-anchor': anchor || 'start',
-      'dominant-baseline': 'middle'
-    }, svg);
-    t.textContent = text;
-    return t;
-  }
+    const nameEl = document.createElement('span');
+    nameEl.className = 'tname' + (!name ? ' tbd-name' : isWinner ? ' won' : '');
+    nameEl.textContent = name || 'TBD';
+    line.appendChild(nameEl);
 
-  // Draw a single team slot (horizontal line + name + score)
-  // Returns the y-center of the line
-  function drawTeamSlot(svg, x, y, name, score, isWinner) {
-    const lineY = y + SLOT_H;
-    // underline
-    drawLine(svg, x, lineY, x + SLOT_W, lineY, isWinner ? WIN_COLOR : LINE_COLOR);
-    // name
-    const nameColor = !name ? MUTED : isWinner ? WIN_COLOR : TEXT_COLOR;
-    drawText(svg, x + 4, lineY - 6, name || 'TBD', nameColor, 12, isWinner ? 600 : 400);
-    // score
     if (score) {
-      drawText(svg, x + SLOT_W - 4, lineY - 6, score, isWinner ? WIN_COLOR : MUTED, 12, 700, 'end');
+      const scoreEl = document.createElement('span');
+      scoreEl.className = 'tscore' + (isWinner ? ' won' : '');
+      scoreEl.textContent = score;
+      line.appendChild(scoreEl);
     }
-    return lineY; // return y of the underline
+
+    slot.appendChild(line);
+    return slot;
   }
 
-  // Draw a matchup (2 teams) at position x, y
-  // Returns the y-center between the two team lines (where connector comes in/out)
-  function drawMatchup(svg, x, y, match) {
-    const isT1W = !!match.winner && match.winner === match.team1;
-    const isT2W = !!match.winner && match.winner === match.team2;
+  function renderTree(containerId, roundData, roundNames) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
 
-    const y1 = drawTeamSlot(svg, x, y,                   match.team1, match.score1, isT1W);
-    const y2 = drawTeamSlot(svg, x, y + SLOT_H + MATCH_GAP, match.team2, match.score2, isT2W);
+    const rounds = Object.keys(roundData).map(Number).sort((a,b) => a - b);
+    if (rounds.length === 0) {
+      const p = document.createElement('p');
+      p.className = 'no-data';
+      p.textContent = 'No data yet';
+      container.appendChild(p);
+      return;
+    }
 
-    // vertical line on right side connecting the two underlines
-    drawLine(svg, x + SLOT_W, y1, x + SLOT_W, y2);
+    rounds.forEach((rNum, rIdx) => {
+      const col = document.createElement('div');
+      col.className = 'r-col';
+      col.style.flex = '0 0 190px';
 
-    // return midpoint y
-    return (y1 + y2) / 2;
-  }
+      // Round header
+      const hdr = document.createElement('div');
+      hdr.className = 'r-header';
+      hdr.textContent = roundNames[rNum] || `Round ${rNum}`;
+      col.appendChild(hdr);
 
-  // Draw a full bracket section (winners or losers)
-  // rounds: { 1: [{...}], 2: [{...}], ... }
-  // Returns: { width, height, lastColCenters: [y,...] } so we can connect to champ
-  function drawSection(svg, rounds, roundNames, startX, startY, accentColor) {
-    const roundNums = Object.keys(rounds).map(Number).sort((a,b)=>a-b);
-    if (roundNums.length === 0) return { width: 0, height: 0, lastColCenters: [] };
+      // Matches container — use a flex column with space-around
+      const matchesWrap = document.createElement('div');
+      matchesWrap.style.cssText = 'display:flex;flex-direction:column;flex:1;justify-content:space-around;';
 
-    // Pre-calculate y positions per round using spacing that doubles each round
-    // Round 1 matches are spaced based on max matches count
-    const maxMatches = rounds[roundNums[0]].length;
-    const unitH = MATCH_H + 20; // vertical unit per match slot in R1
+      roundData[rNum].forEach((match, mIdx) => {
+        const matchup = document.createElement('div');
+        matchup.className = 'matchup';
+        matchup.style.position = 'relative';
 
-    // For each round, calculate y centers of matches
-    const centers = {}; // round -> [yCenter, ...]
+        const isT1Winner = !!match.winner && match.winner === match.team1;
+        const isT2Winner = !!match.winner && match.winner === match.team2;
 
-    roundNums.forEach((rNum, rIdx) => {
-      const matches = rounds[rNum];
-      const count   = matches.length;
-      // total section height based on R1
-      const totalH  = maxMatches * unitH;
-      // evenly space matches within totalH
-      const slotH   = totalH / count;
-      centers[rNum] = matches.map((_, i) => startY + LABEL_H + slotH * i + slotH / 2);
-    });
+        matchup.appendChild(makeTeamSlot(match.team1, match.score1, isT1Winner));
+        matchup.appendChild(makeTeamSlot(match.team2, match.score2, isT2Winner));
 
-    const totalH = maxMatches * unitH + LABEL_H;
-
-    // Draw round labels + matchups + connectors
-    roundNums.forEach((rNum, rIdx) => {
-      const x       = startX + rIdx * (SLOT_W + COL_GAP);
-      const matches = rounds[rNum];
-      const label   = roundNames[rNum] || `Round ${rNum}`;
-
-      // Round label
-      drawText(svg, x + SLOT_W/2, startY + 10, label, MUTED, 9, 600, 'middle');
-
-      // Draw each matchup
-      matches.forEach((match, mIdx) => {
-        const cy  = centers[rNum][mIdx];          // desired center y
-        const my  = cy - MATCH_H / 2;             // top y of matchup
-        const mid = drawMatchup(svg, x, my, match);
-
-        // Draw horizontal connector to next round (if not last round)
-        if (rIdx < roundNums.length - 1) {
-          const nextX = x + SLOT_W + COL_GAP;
-          // horizontal line from right side midpoint to midpoint of next round slot
-          const nextCenters = centers[roundNums[rIdx + 1]];
-          const nextMIdx    = Math.floor(mIdx / 2);
-          const nextCY      = nextCenters[nextMIdx];
-
-          // horizontal line going right from this match
-          drawLine(svg, x + SLOT_W, mid, x + SLOT_W + COL_GAP / 2, mid);
-
-          // if this is even-indexed, draw the vertical part + horizontal to next col
-          if (mIdx % 2 === 0) {
-            const partnerMid = centers[rNum][mIdx + 1] !== undefined
-                    ? centers[rNum][mIdx + 1] - (MATCH_H / 2) + SLOT_H + (SLOT_H + MATCH_GAP / 2)
-                    : mid;
-            // we'll draw vertical + horizontal after both matches are done
-          }
+        // connector line to next round (not on last col)
+        if (rIdx < rounds.length - 1) {
+          const conn = document.createElement('div');
+          conn.className = 'connector';
+          matchup.appendChild(conn);
         }
+
+        matchesWrap.appendChild(matchup);
       });
 
-      // Draw vertical + outgoing connector between pairs of matches
-      if (rIdx < roundNums.length - 1) {
-        const x2 = x + SLOT_W + COL_GAP / 2;
-        const x3 = x + SLOT_W + COL_GAP;
-        const nextCenters = centers[roundNums[rIdx + 1]];
+      col.appendChild(matchesWrap);
+      container.appendChild(col);
 
-        for (let p = 0; p < matches.length; p += 2) {
-          const cy1 = centers[rNum][p];
-          const cy2 = centers[rNum][p + 1] !== undefined ? centers[rNum][p + 1] : cy1;
-          const midY = (cy1 + cy2) / 2;
-          const nextCY = nextCenters[Math.floor(p / 2)];
-
-          // vertical connecting cy1 and cy2 at x2
-          drawLine(svg, x2, cy1, x2, cy2);
-          // horizontal from midpoint to next col
-          drawLine(svg, x2, midY, x3, midY);
-          // small horizontal into next col left edge
-          drawLine(svg, x3, midY, x3, nextCY);
-        }
+      // Gap column for connector lines between rounds
+      if (rIdx < rounds.length - 1) {
+        const gap = document.createElement('div');
+        gap.style.cssText = 'flex:0 0 20px;';
+        container.appendChild(gap);
       }
+    });
+  }
 
-      // Accent left border on first col slots
-      if (rIdx === 0) {
-        matches.forEach((_, mIdx) => {
-          const cy = centers[rNum][mIdx];
-          const my = cy - MATCH_H / 2;
-          drawLine(svg, x - 3, my + SLOT_H, x - 3, my + SLOT_H + MATCH_GAP + SLOT_H, accentColor);
-        });
+  function renderChamp(containerId, roundData, roundNames) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+
+    const rounds = Object.keys(roundData).map(Number).sort((a,b) => a - b);
+
+    rounds.forEach((rNum, rIdx) => {
+      const col = document.createElement('div');
+      col.className = 'r-col';
+      col.style.flex = '0 0 190px';
+
+      const hdr = document.createElement('div');
+      hdr.className = 'r-header';
+      hdr.textContent = roundNames[rNum] || `Round ${rNum}`;
+      col.appendChild(hdr);
+
+      const matchesWrap = document.createElement('div');
+      matchesWrap.style.cssText = 'display:flex;flex-direction:column;flex:1;justify-content:space-around;';
+
+      roundData[rNum].forEach(match => {
+        const matchup = document.createElement('div');
+        matchup.className = 'matchup';
+        matchup.style.cssText = 'position:relative;border-left:2px solid var(--champ);padding-left:4px;';
+
+        const isT1Winner = !!match.winner && match.winner === match.team1;
+        const isT2Winner = !!match.winner && match.winner === match.team2;
+
+        matchup.appendChild(makeTeamSlot(match.team1, match.score1, isT1Winner));
+        matchup.appendChild(makeTeamSlot(match.team2, match.score2, isT2Winner));
+
+        if (rIdx < rounds.length - 1) {
+          const conn = document.createElement('div');
+          conn.className = 'connector';
+          matchup.appendChild(conn);
+        }
+
+        matchesWrap.appendChild(matchup);
+      });
+
+      col.appendChild(matchesWrap);
+      container.appendChild(col);
+
+      if (rIdx < rounds.length - 1) {
+        const gap = document.createElement('div');
+        gap.style.cssText = 'flex:0 0 20px;';
+        container.appendChild(gap);
       }
     });
 
-    const lastRound = roundNums[roundNums.length - 1];
-    const lastX     = startX + (roundNums.length - 1) * (SLOT_W + COL_GAP) + SLOT_W;
-
-    return {
-      width: roundNums.length * (SLOT_W + COL_GAP),
-      height: totalH,
-      lastColCenters: centers[lastRound],
-      lastX
-    };
-  }
-
-  // ── Main draw ─────────────────────────────────────────────────────────────────
-  function drawBracket() {
-    const svg = document.getElementById('bracket-svg');
-    svg.innerHTML = '';
-
-    const WINNERS_ROUND_NAMES = { 1:'Round 1', 2:'Round 2', 3:'Semifinals', 4:"Winner's Final" };
-    const LOSERS_ROUND_NAMES  = { 1:'Round 1', 2:'Round 2', 3:'Round 3',    4:'Round 4', 5:"Loser's Final" };
-    const CHAMP_ROUND_NAMES   = { 1:'Grand Final', 2:'If Necessary' };
-
-    const PAD   = 30;
-    const GUTTER= 40; // between winners and losers
-
-    // Section labels
-    const wLabelY = PAD;
-    const wStartY = wLabelY + 20;
-
-    // Measure winners height
-    const wRounds   = Object.keys(winnersData).length;
-    const wMatches  = winnersData[1]?.length || 5;
-    const wUnitH    = MATCH_H + 20;
-    const wHeight   = wMatches * wUnitH + LABEL_H + 20;
-
-    const lLabelY   = wStartY + wHeight + GUTTER;
-    const lStartY   = lLabelY + 20;
-    const lMatches  = losersData[1]?.length || 4;
-    const lHeight   = lMatches * wUnitH + LABEL_H + 20;
-
-    const cLabelY   = lStartY + lHeight + GUTTER;
-    const cStartY   = cLabelY + 20;
-    const cHeight   = 120;
-
-    const totalH = cStartY + cHeight + PAD;
-
-    // Calculate total width
-    const wCols = Object.keys(winnersData).length || 1;
-    const lCols = Object.keys(losersData).length  || 1;
-    const cCols = Object.keys(champData).length   || 1;
-    const maxCols = Math.max(wCols, lCols, cCols);
-    const totalW = PAD + maxCols * (SLOT_W + COL_GAP) + 200;
-
-    svg.setAttribute('width', totalW);
-    svg.setAttribute('height', totalH);
-    svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
-
-    // Background
-    el('rect', { x:0, y:0, width:totalW, height:totalH, fill:'#0a0e1a' }, svg);
-
-    // Section labels
-    const wLabel = el('text', { x: PAD, y: wLabelY + 14, fill: '#f97316', 'font-size': 13, 'font-weight': 700, 'letter-spacing': 3, 'font-family': 'Bebas Neue, sans-serif' }, svg);
-    wLabel.textContent = "WINNER'S BRACKET";
-
-    const lLabel = el('text', { x: PAD, y: lLabelY + 14, fill: '#3b82f6', 'font-size': 13, 'font-weight': 700, 'letter-spacing': 3, 'font-family': 'Bebas Neue, sans-serif' }, svg);
-    lLabel.textContent = "LOSER'S BRACKET";
-
-    const cLabel = el('text', { x: PAD, y: cLabelY + 14, fill: '#a855f7', 'font-size': 13, 'font-weight': 700, 'letter-spacing': 3, 'font-family': 'Bebas Neue, sans-serif' }, svg);
-    cLabel.textContent = "CHAMPIONSHIP";
-
-    // Draw sections
-    const wResult = drawSection(svg, winnersData, WINNERS_ROUND_NAMES, PAD, wStartY, '#f97316');
-    const lResult = drawSection(svg, losersData,  LOSERS_ROUND_NAMES,  PAD, lStartY, '#3b82f6');
-    const cResult = drawSection(svg, champData,   CHAMP_ROUND_NAMES,   PAD, cStartY, '#a855f7');
-
     // Champion display
-    const champRounds = Object.keys(champData).map(Number).sort((a,b)=>a-b);
-    const lastChampRound = champRounds[champRounds.length - 1];
-    const champName = lastChampRound ? (champData[lastChampRound][0]?.winner || '—') : '—';
+    const lastRound = rounds[rounds.length - 1];
+    const champName = lastRound ? (roundData[lastRound][0]?.winner || '—') : '—';
 
-    const champX = PAD + (Object.keys(champData).length) * (SLOT_W + COL_GAP) + 20;
-    const champY = cStartY + 20;
-
-    drawText(svg, champX + 30, champY + 10, '🏆', GOLD, 24, 400, 'middle');
-    drawText(svg, champX + 30, champY + 40, 'CHAMPION', MUTED, 9, 600, 'middle');
-    const cnText = el('text', {
-      x: champX + 30, y: champY + 58,
-      fill: GOLD, 'font-size': 15, 'font-weight': 700,
-      'font-family': 'Bebas Neue, sans-serif',
-      'letter-spacing': 2, 'text-anchor': 'middle', 'dominant-baseline': 'middle'
-    }, svg);
-    cnText.textContent = champName;
+    const champCol = document.createElement('div');
+    champCol.className = 'champ-col';
+    champCol.innerHTML = `
+    <div class="trophy">🏆</div>
+    <div class="champ-label">Tournament<br>Champion</div>
+    <div class="champ-name">${champName}</div>
+  `;
+    container.appendChild(champCol);
   }
 
   loadFromSheet();
