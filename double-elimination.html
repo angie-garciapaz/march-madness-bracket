@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10 Team Double Elimination</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --border: #1e2d45;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --gold: #fbbf24;
+    --winners: #3cb4e5;
+    --losers: #f97316;
+    --champ: #a855f7;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: auto;
+  }
+
+  header {
+    text-align: center;
+    padding: 40px 20px 24px;
+  }
+
+  header .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--winners);
+    margin-bottom: 8px;
+  }
+
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 7vw, 80px);
+    letter-spacing: 2px;
+    line-height: 1;
+    background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  header .subtitle {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+  .dot.live { background: #4ade80; box-shadow: 0 0 8px #4ade80; }
+  .dot.error { background: #f87171; }
+
+  .tournament-wrapper {
+    padding: 30px 24px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* ── Section labels ── */
+  .section-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 3px;
+    padding: 0 0 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 40px;
+  }
+  .section-label:first-child { margin-top: 0; }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+    margin: 32px 0;
+  }
+
+  /* ── Bracket layout ── */
+  .bracket-scroll { overflow-x: auto; padding-bottom: 10px; }
+
+  .bracket {
+    display: flex;
+    align-items: stretch;
+    min-width: 700px;
+    gap: 0;
+  }
+
+  .round-col {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 155px;
+  }
+
+  .round-header {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    padding: 0 6px 12px;
+  }
+
+  .round-matches {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-around;
+  }
+
+  .match-slot {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Connector line to the right */
+  .match-slot::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 6px;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .round-col:last-child .match-slot::after { display: none; }
+
+  .matchup-card {
+    margin: 5px 6px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .matchup-card.winners-card { border-left: 2px solid var(--winners); }
+  .matchup-card.losers-card  { border-left: 2px solid var(--losers); }
+  .matchup-card.champ-card   { border-left: 2px solid var(--champ); }
+
+  .team-row {
+    display: flex;
+    align-items: center;
+    padding: 7px 10px;
+    gap: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .team-row:last-child { border-bottom: none; }
+
+  .team-name {
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text);
+    flex: 1;
+  }
+  .team-name.tbd { color: var(--border); font-style: italic; }
+  .team-name.winner-name { color: #4ade80; font-weight: 600; }
+
+  .team-score {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .team-score.winner-score { color: #4ade80; }
+
+  /* ── Champion block ── */
+  .champion-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px 8px;
+    text-align: center;
+  }
+
+  .trophy { font-size: 30px; animation: float 3s ease-in-out infinite; }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .champ-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .champ-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    min-height: 24px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Double Elimination</div>
+  <h1>10 Team Tournament</h1>
+  <div class="subtitle">Winners Bracket &nbsp;·&nbsp; Losers Bracket &nbsp;·&nbsp; Championship</div>
+</header>
+
+<div class="status-bar">
+  <div class="dot" id="api-dot"></div>
+  <span id="api-status-text">Loading bracket...</span>
+</div>
+
+<div class="tournament-wrapper">
+
+  <!-- Winners Bracket -->
+  <div class="section-label" style="color:var(--winners)">Winner's Bracket</div>
+  <div class="bracket-scroll">
+    <div class="bracket" id="winners-bracket"></div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- Losers Bracket -->
+  <div class="section-label" style="color:var(--losers)">Loser's Bracket</div>
+  <div class="bracket-scroll">
+    <div class="bracket" id="losers-bracket"></div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- Championship -->
+  <div class="section-label" style="color:var(--champ)">🏆 Championship</div>
+  <div class="bracket-scroll">
+    <div class="bracket" id="champ-bracket"></div>
+  </div>
+
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const SHEET_ID = '1RL-uJQzXWHlg2ck9qOOy-g2L02xnWLjf4GJaCkZ7pXc';
+const TAB_NAME = 'Ehp_Bracket';
+// API key is hidden via Netlify function
+// ─────────────────────────────────────────────────────────────────────────────
+
+const REFRESH_MS = 60 * 1000;
+
+const WINNERS_ROUNDS = { 1: 'Round 1', 2: 'Round 2', 3: 'Semifinals', 4: "Winner's Final" };
+const LOSERS_ROUNDS  = { 1: 'Round 1', 2: 'Round 2', 3: 'Round 3', 4: 'Round 4', 5: "Loser's Final" };
+const CHAMP_ROUNDS   = { 1: 'Grand Final', 2: 'If Necessary' };
+
+async function loadFromSheet() {
+  try {
+    const url = `/.netlify/functions/bracket-ehp`;
+    const res  = await fetch(url);
+    const data = await res.json();
+
+    if (data.error) throw new Error(`${data.error.status}: ${data.error.message}`);
+
+    const rows  = data.values || [];
+    const start = rows[0]?.[0]?.toLowerCase() === 'bracket' ? 1 : 0;
+
+    const winners = {};
+    const losers  = {};
+    const champ   = {};
+
+    rows.slice(start).forEach(row => {
+      const bracket = (row[0] || '').trim().toLowerCase();
+      const round   = parseInt(row[1]);
+      const team1   = (row[3] || '').trim();
+      const team2   = (row[4] || '').trim();
+      const score1  = (row[5] || '').trim();
+      const score2  = (row[6] || '').trim();
+      const winner  = (row[7] || '').trim();
+
+      if (!round || (!team1 && !team2)) return;
+
+      let bucket;
+      if (bracket.includes('winner'))      bucket = winners;
+      else if (bracket.includes('loser'))  bucket = losers;
+      else if (bracket.includes('champ'))  bucket = champ;
+      else return;
+
+      if (!bucket[round]) bucket[round] = [];
+      bucket[round].push({ team1, team2, score1, score2, winner });
+    });
+
+    renderBracket('winners-bracket', winners, WINNERS_ROUNDS, 'winners-card');
+    renderBracket('losers-bracket',  losers,  LOSERS_ROUNDS,  'losers-card');
+    renderBracket('champ-bracket',   champ,   CHAMP_ROUNDS,   'champ-card', true);
+
+    document.getElementById('api-dot').className = 'dot live';
+    document.getElementById('api-status-text').textContent = `Live · Last updated ${new Date().toLocaleTimeString()}`;
+
+  } catch (err) {
+    document.getElementById('api-dot').className = 'dot error';
+    document.getElementById('api-status-text').textContent = `Error: ${err.message}`;
+    console.error(err);
+  }
+}
+
+function renderBracket(containerId, roundData, roundNames, cardClass, isChamp = false) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+
+  const roundNumbers = Object.keys(roundData).map(Number).sort((a, b) => a - b);
+  if (roundNumbers.length === 0) {
+    container.innerHTML = '<p style="color:var(--muted);padding:16px;font-size:12px">No data yet</p>';
+    return;
+  }
+
+  roundNumbers.forEach(rNum => {
+    const col = document.createElement('div');
+    col.className = 'round-col';
+
+    const hdr = document.createElement('div');
+    hdr.className = 'round-header';
+    hdr.textContent = roundNames[rNum] || `Round ${rNum}`;
+    col.appendChild(hdr);
+
+    const matchesDiv = document.createElement('div');
+    matchesDiv.className = 'round-matches';
+
+    roundData[rNum].forEach(match => {
+      const slot = document.createElement('div');
+      slot.className = 'match-slot';
+
+      const card = document.createElement('div');
+      card.className = `matchup-card ${cardClass}`;
+
+      [
+        { name: match.team1, score: match.score1, isWinner: !!match.winner && match.winner === match.team1 },
+        { name: match.team2, score: match.score2, isWinner: !!match.winner && match.winner === match.team2 },
+      ].forEach(({ name, score, isWinner }) => {
+        const row = document.createElement('div');
+        row.className = 'team-row';
+        const cls = !name ? 'tbd' : isWinner ? 'winner-name' : '';
+        row.innerHTML = `
+          <span class="team-name ${cls}">${name || 'TBD'}</span>
+          ${score ? `<span class="team-score ${isWinner ? 'winner-score' : ''}">${score}</span>` : ''}
+        `;
+        card.appendChild(row);
+      });
+
+      slot.appendChild(card);
+      matchesDiv.appendChild(slot);
+    });
+
+    col.appendChild(matchesDiv);
+    container.appendChild(col);
+  });
+
+  // Champion display for the champ bracket
+  if (isChamp) {
+    const lastRound = roundData[roundNumbers[roundNumbers.length - 1]] || [];
+    const champName = lastRound[0]?.winner || '—';
+
+    const champCol = document.createElement('div');
+    champCol.className = 'round-col';
+    champCol.innerHTML = `
+      <div class="round-header">Champion</div>
+      <div class="round-matches">
+        <div class="champion-block">
+          <div class="trophy">🏆</div>
+          <div class="champ-label">Tournament Champion</div>
+          <div class="champ-name">${champName}</div>
+        </div>
+      </div>
+    `;
+    container.appendChild(champCol);
+  }
+}
+
+loadFromSheet();
+setInterval(loadFromSheet, REFRESH_MS);
+</script>
+</body>
+</html>
